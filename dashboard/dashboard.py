@@ -10,7 +10,14 @@ import os
 path = os.path.join(os.path.dirname(__file__), "main_data.csv")
 df = pd.read_csv(path)
 
-st.title("🚲 Bike Sharing Dashboard")
+df["weathersit"] = df["weathersit"].map({
+    1: "Clear",
+    2: "Mist",
+    3: "Light Snow/Rain",
+    4: "Heavy Rain"
+})
+
+st.title(" Bike Sharing Dashboard")
 
 # ======================
 # FILTER 1: TAHUN
@@ -48,40 +55,8 @@ df_filtered = df_filtered[
 ]
 
 # ======================
-# INFO DATA
+# FILTER 4: CUACA ( PINDAH KE SINI)
 # ======================
-st.write("Jumlah data setelah filter:", df_filtered.shape[0])
-
-# ======================
-# VISUALISASI 1: CUACA
-# ======================
-st.subheader("Pengaruh Cuaca terhadap Penyewaan")
-
-fig1, ax1 = plt.subplots()
-
-df = pd.read_csv(path)
-
-df["weathersit"] = df["weathersit"].map({
-    1: "Clear",
-    2: "Mist",
-    3: "Light Snow/Rain",
-    4: "Heavy Rain"
-})
-
-sns.barplot(
-    x="weathersit",
-    y="cnt",
-    data=df_filtered,
-    order=["Clear", "Mist", "Light Snow/Rain", "Heavy Rain"],
-    ax=ax1
-)
-
-ax1.set_title("Rata-rata Penyewaan Berdasarkan Cuaca")
-ax1.set_xlabel("Kondisi Cuaca")
-ax1.set_ylabel("Jumlah Penyewaan")
-
-st.pyplot(fig1)
-
 weather_option = st.multiselect(
     "Pilih Kondisi Cuaca",
     ["Clear", "Mist", "Light Snow/Rain", "Heavy Rain"],
@@ -91,24 +66,57 @@ weather_option = st.multiselect(
 df_filtered = df_filtered[df_filtered["weathersit"].isin(weather_option)]
 
 # ======================
+# INFO DATA
+# ======================
+st.write("Jumlah data setelah filter:", df_filtered.shape[0])
+
+
+# ======================
+# VISUALISASI 1: CUACA
+# ======================
+st.subheader(" Pengaruh Cuaca terhadap Penyewaan")
+
+if df_filtered.empty:
+    st.warning("Data kosong, coba ubah filter ")
+else:
+    fig1, ax1 = plt.subplots()
+
+    sns.barplot(
+        x="weathersit",
+        y="cnt",
+        data=df_filtered,
+        order=["Clear", "Mist", "Light Snow/Rain", "Heavy Rain"],
+        ax=ax1
+    )
+
+    ax1.set_title("Rata-rata Penyewaan Berdasarkan Cuaca")
+    ax1.set_xlabel("Kondisi Cuaca")
+    ax1.set_ylabel("Jumlah Penyewaan")
+
+    st.pyplot(fig1)
+
+# ======================
 # VISUALISASI 2: JAM
 # ======================
 st.subheader(" Pola Penyewaan per Jam")
 
-fig2, ax2 = plt.subplots()
+if df_filtered.empty:
+    st.warning("Data kosong, coba ubah filter ")
+else:
+    fig2, ax2 = plt.subplots()
 
-sns.lineplot(
-    x="hr",
-    y="cnt",
-    hue="day_type",
-    data=df_filtered,
-    marker="o",
-    ax=ax2
-)
+    sns.lineplot(
+        x="hr",
+        y="cnt",
+        hue="day_type",
+        data=df_filtered,
+        marker="o",
+        ax=ax2
+    )
 
-ax2.set_title("Pola Penyewaan Sepeda per Jam")
-ax2.set_xlabel("Jam")
-ax2.set_ylabel("Jumlah Penyewaan")
-ax2.set_xticks(range(0, 24))
+    ax2.set_title("Pola Penyewaan Sepeda per Jam")
+    ax2.set_xlabel("Jam")
+    ax2.set_ylabel("Jumlah Penyewaan")
+    ax2.set_xticks(range(0, 24))
 
-st.pyplot(fig2)
+    st.pyplot(fig2)
