@@ -2,12 +2,14 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import os
 
 # Title
 st.title("🚲 Bike Sharing Dashboard")
 
 # Load data
-df = pd.read_csv("main_data.csv")
+path = os.path.join(os.path.dirname(__file__), "main_data.csv")
+df = pd.read_csv(path)
 
 # Data preprocessing
 df['season'] = df['season'].map({
