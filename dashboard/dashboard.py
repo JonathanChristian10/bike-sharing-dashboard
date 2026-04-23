@@ -55,9 +55,18 @@ st.write("Jumlah data setelah filter:", df_filtered.shape[0])
 # ======================
 # VISUALISASI 1: CUACA
 # ======================
-st.subheader("🌤️ Pengaruh Cuaca terhadap Penyewaan")
+st.subheader("Pengaruh Cuaca terhadap Penyewaan")
 
 fig1, ax1 = plt.subplots()
+
+df = pd.read_csv(path)
+
+df["weathersit"] = df["weathersit"].map({
+    1: "Clear",
+    2: "Mist",
+    3: "Light Snow/Rain",
+    4: "Heavy Rain"
+})
 
 sns.barplot(
     x="weathersit",
@@ -73,10 +82,18 @@ ax1.set_ylabel("Jumlah Penyewaan")
 
 st.pyplot(fig1)
 
+weather_option = st.multiselect(
+    "Pilih Kondisi Cuaca",
+    ["Clear", "Mist", "Light Snow/Rain", "Heavy Rain"],
+    default=["Clear", "Mist", "Light Snow/Rain", "Heavy Rain"]
+)
+
+df_filtered = df_filtered[df_filtered["weathersit"].isin(weather_option)]
+
 # ======================
 # VISUALISASI 2: JAM
 # ======================
-st.subheader("⏰ Pola Penyewaan per Jam")
+st.subheader(" Pola Penyewaan per Jam")
 
 fig2, ax2 = plt.subplots()
 
